@@ -1,6 +1,7 @@
-const crypto = require("crypto");
+import crypto from "crypto";
+import fetch from "node-fetch";
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Solo POST permitido" });
   }
@@ -30,3 +31,18 @@ module.exports = async (req, res) => {
   try {
     const response = await fetch(`https://graph.facebook.com/v18.0/${pixelID}/events?access_token=${accessToken}`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(500).json({ error: data.error || "Error en la API de Meta" });
+    }
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
