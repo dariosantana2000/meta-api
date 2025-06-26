@@ -15,18 +15,18 @@ export default async function handler(req, res) {
   const hashEmail = crypto.createHash("sha256").update(email.trim().toLowerCase()).digest("hex");
 
   const payload = {
-    data: [
-      {
-        event_name: "Lead",
-        event_time: Math.floor(Date.now() / 1000),
-        action_source: "website",
-        user_data: {
-          em: [hashEmail],
-        },
-        ...(test_event_code && { test_event_code }),
+  data: [
+    {
+      event_name: "Lead",
+      event_time: Math.floor(Date.now() / 1000),
+      action_source: "website",
+      user_data: {
+        em: [hashEmail],
       },
-    ],
-  };
+    },
+  ],
+  ...(test_event_code && { test_event_code }),
+};
 
   try {
     const response = await fetch(`https://graph.facebook.com/v18.0/${pixelID}/events?access_token=${accessToken}`, {
